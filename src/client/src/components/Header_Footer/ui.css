@@ -1,0 +1,690 @@
+
+/* ===== Reset & root ===== */
+html, body, #root { height: 100%; margin: 0; }
+* { box-sizing: border-box; }
+
+:root{
+  --bg:#f6f8fc;
+  --surface:#ffffff;
+  --text:#0f172a;
+  --muted:#64748b;
+  --ring:#93c5fd;
+  --shadow:0 16px 40px rgba(15,23,42,.12);
+  --shadow-side:-18px 0 40px rgba(15,23,42,.20);
+  --active-bg: rgba(255,140,0,.15);
+  --active-ring: orange;
+
+  --hdr-h: 72px;           /* ارتفاع الهيدر الثابت */
+  --container-w: 1280px;   /* أقصى عرض لمحتوى الصفحة */
+}
+
+body{
+  background:var(--bg);
+  color:var(--text);
+  font:15px/1.65 system-ui,-apple-system,Segoe UI,Roboto,Arial;
+}
+
+/* ===== Page container ===== */
+.shell{
+  max-width: var(--container-w);
+  margin: 22px auto;
+  padding: 0 16px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* مساحة آمنة للمحتوى تحت الهيدر الثابت */
+.content-area{
+  flex: 1 1 auto;
+  padding-top: calc(var(--hdr-h) + 16px);
+  padding-bottom: 80px; /* مساحة إضافية قبل الفوتر */
+}
+
+/* ===== Header (ثابت بعرض كامل الشاشة) ===== */
+.headerWrap{
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 900;                 /* السايدبار سيغطيه */
+  background: var(--surface);
+  border-radius: 0;
+  box-shadow: var(--shadow);
+  padding: 14px 22px;
+  border-bottom: 1px solid #e5e7eb;
+  height: var(--hdr-h);
+  display: flex; align-items: center;
+}
+.headerBar{
+  width: min(var(--container-w), 100% - 32px);
+  margin: 0 auto;
+  display:flex; align-items:center; justify-content:space-between;
+  direction:ltr;
+}
+.brand{ display:flex; align-items:center; gap:10px; }
+.logoBox{
+  width: auto;
+  height: auto;
+  background: transparent;
+  border-radius: 0;
+  box-shadow: none;
+  display: grid;
+  place-items: center;
+}
+.logoBox img{
+  height: 44px;           /* تحكم في الارتفاع فقط */
+  width: auto;            /* يحافظ على نسبة الأبعاد */
+  object-fit: contain;
+  display: block;
+}
+@media (max-width: 480px){
+  .logoBox img{ height: 36px; }
+}
+
+.appName{ font-size:22px; font-weight:900; }
+
+/* يمين الهيدر */
+.headerActions{ display:flex; align-items:center; gap:12px; }
+
+
+/* ===== Icon buttons (جرس/حساب/قائمة) ===== */
+.iconBtn{
+  border:0; background:transparent; padding:8px;
+  border-radius:10px; cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  transition:background .2s;
+}
+.iconBtn svg{ stroke:#334155; }
+.iconBtn:hover{ background:#eef2f7; }
+.iconBtn:hover svg{ stroke:var(--active-ring); }
+.iconBtn.active{ background:var(--active-bg); box-shadow:inset 0 0 0 2px var(--active-ring); }
+.iconBtn.active svg{ stroke:var(--active-ring); }
+
+.menuBtn{
+  border:0; background:transparent; padding:10px;
+  border-radius:12px; cursor:pointer; display:inline-grid; place-items:center;
+}
+.menuBtn:hover{ background:#eef2f7; }
+.menuBtn:focus-visible{ outline:2px solid var(--ring); outline-offset:2px; }
+
+/* ===== Profile dropdown ===== */
+.profileWrapper{ position:relative; }
+.profileMenu{
+  position:absolute; top:48px; right:0;
+  width:240px; background:#fff; border:1px solid #e5e7eb;
+  border-radius:12px; box-shadow:var(--shadow); overflow:hidden;
+  z-index:5000; animation:fadeIn .12s ease;
+}
+@keyframes fadeIn{ from{opacity:0; transform:translateY(-6px)} to{opacity:1; transform:translateY(0)} }
+.profileInfo{ padding:12px 14px; border-bottom:1px solid #f1f5f9; text-align:right; }
+.profileInfo strong{ display:block; font-size:14px; color:#0f172a; }
+.profileInfo span{ font-size:12px; color:#64748b; direction:ltr; }
+.profileItem{
+  width:100%; display:flex; align-items:center; gap:10px;
+  padding:10px 14px; border:0; background:transparent;
+  color:#334155; font-size:14px; text-align:right; cursor:pointer;
+  transition:background .2s, color .2s;
+}
+.profileItem .ico{ width:20px; display:inline-flex; justify-content:center; }
+.profileItem:hover{ background:#f5f7fb; color:var(--active-ring); }
+.profileItem.logout{ color:#dc2626; }
+.profileItem.logout:hover{ background:#fff1f1; color:#b91c1c; }
+
+/* ===== Overlay أعلى من الهيدر ===== */
+.overlay{
+  position: fixed; inset: 0;
+  background: rgba(2,6,23,.45);
+  opacity: 0; visibility: hidden; transition: .25s;
+  z-index: 1100;                       /* يغطي الهيدر */
+}
+.overlayShow{ opacity:1; visibility:visible; }
+
+/* ===== Sidebar (يغطي الهيدر) ===== */
+.sidebar{
+  position: fixed !important;
+  top: 0 !important; right: 0 !important; bottom: 0 !important;
+  width: 300px !important; height: 100vh !important;
+  background:#fff;
+  transform: translateX(100%) !important;
+  transition: transform .28s ease;
+  z-index: 1200;                       /* أعلى من الهيدر والـ overlay */
+  display:flex; flex-direction:column; justify-content:space-between;
+  box-shadow: var(--shadow-side);
+  border-top-left-radius:28px; border-bottom-left-radius:28px;
+  overflow:hidden;
+}
+.sidebarOpen{ transform: translateX(0) !important; }
+
+/* Header داخل السايدبار */
+.sidebar .sideHead{
+  display:flex; align-items:center; justify-content:space-between;
+  padding:16px 18px; border-bottom:1px solid #e8edf4; background:transparent;
+}
+.sidebar .sideTitle{ display:flex; align-items:center; gap:12px; direction:ltr; }
+.titleText{ font-weight:900; font-size:20px; }
+.titleLogo{ width:48px; height:48px; border-radius:12px; background:#f2f4f9; display:grid; place-items:center; }
+.titleLogo img{ width:40px; height:40px; object-fit:contain; pointer-events:none; }
+.iconBtn.closeBtn{
+  position:static !important; margin:0 !important;
+  width:40px; height:40px; border-radius:10px; border:1px solid #e8edf4; background:#fff; display:grid; place-items:center;
+}
+.iconBtn.closeBtn:hover{ background:#eef2f7; }
+.iconBtn.closeBtn:active{ transform:scale(.98); }
+
+/* للجوال */
+@media (max-width: 400px){
+  .titleLogo{ width:44px; height:44px; border-radius:11px; }
+  .titleLogo img{ width:36px; height:36px; }
+  .iconBtn.closeBtn{ width:36px; height:36px; border-radius:9px; }
+}
+
+/* Items داخل السايدبار */
+.list{ flex:1 1 auto; padding:12px; overflow-y:auto; }
+.item{
+  display:flex; flex-direction:row; align-items:center; gap:10px; justify-content:flex-start;
+  padding:12px; border-radius:12px; color:#0f172a; text-decoration:none;
+  font-size:15px; font-weight:600; transition:background .2s, color .2s; direction:rtl;
+}
+.item .icon{ flex-shrink:0; width:22px; height:22px; display:flex; align-items:center; justify-content:center; color:#6b7280; }
+.item .icon svg{ width:22px; height:22px; stroke:currentColor; fill:none; stroke-width:1.8; }
+.item .label{ flex:1; text-align:right; line-height:1.4; }
+.item:hover{ background:#f5f7fb; }
+.item:hover .icon{ color:#334155; }
+.item.active{ background:var(--active-bg); box-shadow:inset 0 0 0 2px var(--active-ring); }
+.item.active .icon{ color:var(--active-ring); }
+.item:focus-visible{ outline:2px solid var(--ring); outline-offset:2px; }
+
+/* ===== Footer (Markaz) ===== */
+.mkzFooter{
+  background: transparent; /* شفاف ياخذ نفس التدرجات حق البودي */
+  padding:20px 16px;
+  margin-top:auto;
+  text-align:center;
+}
+
+.mkzBrand{
+  display:flex; align-items:center; justify-content:center;
+  gap:10px; text-decoration:none; margin-bottom:14px;
+}
+.mkzBrand img{
+  width:40px; height:40px; object-fit:contain;
+  border-radius:10px; background:#fff3e0;
+}
+.mkzBrand span{ font-weight:900; font-size:20px; color:var(--text); }
+
+.mkzLinks{
+  list-style:none; margin:0; padding:0;
+  display:flex; justify-content:center; gap:24px;
+  margin-bottom:16px;
+}
+.mkzLinks a{ text-decoration:none; color:#64748b; font-weight:600; transition:color .2s; }
+.mkzLinks a:hover{ color:var(--tone-orange-fg); }
+
+.mkzDivider{
+  border:none; height:1px;
+  background:linear-gradient(to right, transparent, #e2e8f0, transparent);
+  margin:12px auto 16px; max-width:400px;
+}
+
+.mkzFooter__bottom{
+  font-size:13px; color:#94a3b8; text-align:center;
+}
+
+/* ===== تصحيح محاذاة فوتر البروفايل في RTL ===== */
+.sidebar {
+  display: flex;
+  flex-direction: column;
+}
+
+/* الفاصل قبل الفوتر */
+.sideDivider {
+  margin: 8px 12px;
+  height: 1px;
+  background: #e5e7eb;
+}
+
+/* فوتر الحساب */
+.profileFooter {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px 12px;
+  position: sticky;
+  bottom: 0;
+  background: #fff;
+  border-top: 1px solid #f1f5f9;
+}
+
+/* في RTL: ادفع زر الثلاث نقاط إلى الحافة اليمنى */
+html[dir="rtl"] .profileFooter .menuWrap {
+  margin-inline-start: auto;  /* يدفعه لجهة البداية = اليمين في RTL */
+}
+
+/* قائمة المنسدلة: اربطها بيمين الزر في RTL */
+html[dir="rtl"] .menuDropdown {
+  inset-inline-end: 0;   /* محسوبة سابقاً */
+  inset-inline-start: auto;
+  bottom: 46px;
+}
+
+/* كتلة الاسم/الأفاتار */
+.profileInfo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+}
+
+.profileInfo .avatar {
+  width: 36px;   /* كان 28px */
+  height: 36px;
+  color: #0f172a;
+  display: grid;
+  place-items: center;
+}
+
+.profileInfo .names {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  text-align: start; /* ينسجم مع RTL بدون قلب غير مرغوب */
+}
+
+.profileInfo .name{
+  max-width: 220px;      /* كبّريها حسب ما يناسبك */
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+
+.profileInfo .sub {
+  font-size: 12px;
+  color: #64748b;
+}
+
+/* زر الثلاث نقاط */
+.iconBtn.dotsBtn {
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  background: #f8fafc;
+  border: 1px solid #e5e7eb;
+  display: grid;
+  place-items: center;
+}
+.iconBtn.dotsBtn:hover { background: #f1f5f9; }
+
+/* القائمة المنسدلة */
+.menuWrap { position: relative; }
+
+.menuDropdown {
+  position: absolute;
+  min-width: 180px;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  box-shadow: 0 12px 32px rgba(2, 8, 23, .15);
+  padding: 6px;
+  z-index: 40;
+}
+
+.menuItem {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  border-radius: 10px;
+  color: #0f172a;
+  background: transparent;
+  border: 0;
+  text-align: start;
+  cursor: pointer;
+}
+.menuItem:hover { background: #f8fafc; }
+.menuItem.danger { color: #b91c1c; }
+.menuItem .miIcon { width: 20px; height: 20px; display: grid; place-items: center; }
+
+      
+            .confirmOverlay {
+              position: fixed;
+              inset: 0;
+              background: rgba(0,0,0,.4);
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              z-index: 9999;
+            }
+            .confirmBox {
+              background: #fff;
+              padding: 24px 20px;
+              border-radius: 14px;
+              box-shadow: 0 8px 25px rgba(0,0,0,.15);
+              width: 90%;
+              max-width: 360px;
+              text-align: center;
+              font-family: "Tajawal", sans-serif;
+            }
+            .confirmMessage {
+              font-size: 18px;
+              margin-bottom: 18px;
+              color: #111827;
+              font-weight: 600;
+            }
+            .confirmActions {
+              display: flex;
+              justify-content: space-between;
+              gap: 10px;
+            }
+            .confirmActions button {
+              flex: 1;
+              padding: 10px;
+              font-size: 15px;
+              border-radius: 8px;
+              cursor: pointer;
+              transition: 0.2s ease;
+            }
+            .btnCancel {
+              background: #f3f4f6;
+              color: #374151;
+              border: 1px solid #d1d5db;
+            }
+            .btnCancel:hover {
+              background: #e5e7eb;
+            }
+            .btnConfirm {
+              background: #ef4444;
+              color: white;
+              border: none;
+              font-weight: bold;
+            }
+            .btnConfirm:hover {
+              background: #dc2626;
+            }
+      
+            
+
+/* شيل الحواف المنحنية والحدود من السايدبار */
+.sidebar {
+  border-radius: 0 !important;     /* لا منحنيات */
+  border: none !important;         /* لا حدود */
+  box-shadow: var(--shadow-side);  /* احتفظ بالظل الجانبي فقط */
+}
+
+/* رأس السايدبار بدون خط سفلي */
+.sidebar .sideHead {
+  border-bottom: none !important;
+}
+
+/* فاصل القائمة (لو تبغين تحذفيه كلياً) */
+.sideDivider {
+  display: none !important;
+}
+/* ——— هيدر شفاف بزجاجية (Glass) ——— */
+.headerWrap {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: var(--hdr-h);
+  z-index: 900;
+
+  /* خلفية شبه شفافة */
+  background: rgba(255, 255, 255, 0.7);
+
+  /* تأثير الزجاج */
+  backdrop-filter: blur(12px) saturate(150%);
+  -webkit-backdrop-filter: blur(12px) saturate(150%);
+
+  /* خط سفلي خفيف جدا */
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+
+  /* ظل لطيف */
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+
+  display: flex;
+  align-items: center;
+}
+/* اللوقو في السايدبار */
+.titleLogo {
+  width: 60px;            /* كبّري الحجم */
+  height: 60px;
+  border-radius: 16px;    /* زوايا ناعمة */
+  background: transparent; /* ألغِ الخلفية الرمادية */
+  display: grid;
+  place-items: center;
+}
+
+.titleLogo img {
+  width: 52px;            /* يكبر داخل الحاوية */
+  height: 52px;
+  object-fit: contain;    /* يحافظ على التناسب */
+}
+/* اللوقو في الهيدر */
+.logoBox {
+  width: 60px;             /* نفس حجم السايدبار */
+  height: 60px;
+  background: transparent; /* بدون خلفية */
+  border-radius: 16px;     /* زوايا ناعمة */
+  box-shadow: none;
+  display: grid;
+  place-items: center;
+}
+
+.logoBox img {
+  width: 52px;             /* نفس مقاس الصورة */
+  height: 52px;
+  object-fit: contain;     /* يحافظ على التناسب */
+  display: block;
+}
+
+/* فوتر الحساب */
+.profileFooter{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:10px 12px 12px;
+  position:sticky; bottom:0;
+  background:#fff;
+  border-top:1px solid #f1f5f9;
+}
+
+/* يدفع زر الخروج لأقصى اليمين (مكان الثلاث نقاط) */
+.flexSpacer{ flex:1; }
+
+/* كتلة الاسم/الأفاتار */
+.profileInfo{ display:flex; align-items:center; gap:10px; cursor:pointer; }
+.profileInfo .name{ max-width:220px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.profileInfo .sub{ font-size:12px; color:#64748b; }
+
+/* زر الخروج أيقونة فقط */
+.logoutBtn{
+  color:#dc2626;
+  border:none; background:transparent; cursor:pointer;
+  padding:6px; border-radius:8px;
+  display:flex; align-items:center; justify-content:center;
+  transition:background .2s, color .2s;
+}
+.logoutBtn svg{ stroke:#dc2626; width:22px; height:22px; }
+.logoutBtn:hover{ background:#fff1f1; }
+.logoutBtn:hover svg{ stroke:#b91c1c; }
+.avatarImg {
+  width: 40px;              /* حجم مناسب */
+  height: 40px;
+  border-radius: 50%;       /* تخليها دائرية */
+  object-fit: cover;        /* قص الصورة داخل الإطار */
+  border: none;             /* 🔴 يشيل الإطار الرمادي */
+  background: transparent;  /* 🔴 يلغي أي خلفية */
+  box-shadow: none;         /* 🔴 يلغي الظل */
+}
+
+/* ===================== FIX & RESPONSIVE (FINAL) ===================== */
+/* 1) تأكيد سلوك الفتح/الإغلاق بالضغط فقط */
+.sidebar{ transform: translateX(100%) !important; }      /* مغلق افتراضيًا */
+.sidebarOpen{ transform: translateX(0) !important; }     /* يفتح عند إضافة الكلاس */
+
+/* لا تغيّري transform في الميديا كويريز — العرض فقط هو اللي يتغيّر */
+
+/* 2) مقاسات الحاوية والهيدر حسب الشاشة */
+@media (max-width: 1440px){
+  :root{ --container-w: 1120px; }
+}
+@media (max-width: 1024px){
+  :root{ --container-w: 920px; }
+}
+@media (max-width: 768px){
+  :root{ --container-w: 680px; --hdr-h: 64px; }
+}
+@media (max-width: 600px){
+  :root{ --container-w: 100%; --hdr-h: 60px; }
+}
+
+/* 3) الهيدر */
+@media (max-width: 1024px){
+  .headerWrap{ padding: 10px 14px; }
+  .appName{ font-size: 20px; }
+}
+@media (max-width: 768px){
+  .headerBar{ width: calc(100% - 20px); }
+  .headerActions{ gap: 8px; }
+  .iconBtn{ padding: 6px; border-radius: 8px; }
+  .logoBox img{ height: 40px; }
+}
+@media (max-width: 480px){
+  .logoBox img{ height: 34px; }
+  .appName{ display: none; } /* لتوفير مساحة على أصغر شاشات */
+}
+@media (max-width: 768px){
+  .content-area{ padding-top: calc(var(--hdr-h) + 10px); }
+}
+@media (max-width: 480px){
+  .content-area{ padding-top: calc(var(--hdr-h) + 6px); }
+}
+
+/* 4) السايدبار — يتغير العرض فقط (بدون فتح تلقائي) */
+@media (max-width: 1024px){
+  .sidebar{
+    width: 320px !important;
+    border-top-left-radius: 22px;
+    border-bottom-left-radius: 22px;
+  }
+}
+@media (max-width: 768px){
+  .sidebar{
+    width: 100% !important;            /* يغطي عرض الشاشة */
+    border-radius: 0 !important;       /* بدون حواف */
+    box-shadow: none;                  /* بدون ظل جانبي على الموبايل */
+  }
+  .sidebar .sideHead{ padding: 14px; }
+  .titleLogo{ width: 52px; height: 52px; border-radius: 14px; }
+  .titleLogo img{ width: 46px; height: 46px; }
+  .list{ padding: 10px; }
+  .item{ gap: 8px; font-size: 15px; }
+  .item .icon, .item .icon svg{ width: 20px; height: 20px; }
+}
+@media (max-width: 600px){
+  .list{ padding: 8px; }
+  .item{ padding: 10px 12px; font-size: 14px; border-radius: 10px; }
+}
+@media (max-width: 400px){
+  .item{ padding: 9px 10px; border-radius: 8px; }
+}
+
+/* 5) الأوفرلاي — يبان فقط لما السايدبار مفتوح */
+.overlay{ display: none; }                  /* افتراضيًا مخفي */
+.sidebarOpen ~ .overlay,
+.sidebar.sidebarOpen + .overlay,
+.overlay.overlayShow{ display: block; }     /* إظهاره عند الفتح */
+@media (max-width: 768px){
+  .overlay{ background: rgba(2,6,23,.55); } /* تعتيم مناسب للموبايل */
+}
+
+/* 6) فوتر الحساب داخل السايدبار */
+@media (max-width: 768px){
+  .profileFooter{
+    padding: 10px 12px calc(12px + env(safe-area-inset-bottom));
+    border-top: 1px solid #eef2f7;
+    gap: 10px;
+  }
+  .profileInfo .name{ max-width: 180px; }
+  .avatarImg{ width: 36px; height: 36px; }
+  .logoutBtn{ padding: 6px; border-radius: 8px; }
+  .logoutBtn svg{ width: 22px; height: 22px; }
+}
+@media (max-width: 480px){
+  .profileInfo .name{ max-width: 140px; }
+  .avatarImg{ width: 32px; height: 32px; }
+  .logoutBtn svg{ width: 20px; height: 20px; }
+}
+
+/* 7) صورة البروفايل (Responsive) */
+@media (min-width: 1024px){
+  .avatarImg{ width: 44px; height: 44px; }
+}
+@media (max-width: 480px){
+  .avatarImg{ width: 32px; height: 32px; }
+}
+
+/* 8) تصغير أيقونات الأزرار على الشاشات الصغيرة */
+@media (max-width: 480px){
+  .iconBtn svg{ width: 20px; height: 20px; }
+}
+/* مغلق افتراضيًا — يفتح فقط مع .sidebarOpen */
+.sidebar{ transform: translateX(100%) !important; }
+.sidebarOpen{ transform: translateX(0) !important; }
+
+/* موبايل: فل سكرين */
+@media (max-width: 768px){
+  .sidebar{ width: 100% !important; border-radius: 0 !important; box-shadow: none; }
+}
+
+/* أوفرلاي + منع تمرير الخلفية */
+.overlay{ position:fixed; inset:0; background:rgba(2,6,23,.45); display:none; z-index:1100; }
+.overlay.overlayShow{ display:block; }
+.body--noscroll{ overflow:hidden; touch-action:none; }
+
+/* صورة البروفايل */
+.avatarImg{
+  width: 40px; height: 40px; border-radius: 50%;
+  object-fit: cover; border: none; background: transparent; box-shadow: none;
+}
+
+/* زر خروج أيقونة فقط */
+.logoutBtn{ color:#dc2626; }
+.logoutBtn svg{ stroke:#dc2626; }
+.logoutBtn:hover{ background:#fff1f1; }
+.logoutBtn:hover svg{ stroke:#b91c1c; }
+
+/* فوتر الحساب */
+.profileFooter{ display:flex; align-items:center; gap:10px; padding:10px 12px; border-top:1px solid #f1f5f9; background:#fff; }
+.flexSpacer{ flex:1; }
+
+/* السايدبار افتراضيًا */
+.sidebar {
+  transform: translateX(100%);
+  transition: transform .28s ease;
+  width: 300px; /* العرض الأساسي */
+}
+
+/* مفتوح */
+.sidebarOpen {
+  transform: translateX(0);
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    width: 70% !important;   /* أو 280px إذا تبغينه ثابت */
+    box-shadow: -4px 0 20px rgba(0,0,0,.15); /* يبين ظل */
+  }
+}
+
+.mkzMenu .item {
+  display: block;
+  padding: .75rem 1rem;
+  border-radius: .75rem;
+  color: inherit;
+  text-decoration: none;
+}
+.mkzMenu .item.active {
+  background: #eef2ff;
+  color: #1d4ed8;
+  font-weight: 600;
+}
